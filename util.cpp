@@ -38,7 +38,8 @@ bool want_echo()
     constexpr int COUT_FD{ 1 };
     bool cin_is_not_a_tty = not isatty(CIN_FD);
     bool cout_is_not_a_tty = not isatty(COUT_FD);
-    DEBUGF('u', "cin_is_not_a_tty = " << cin_is_not_a_tty << ", cout_is_not_a_tty = " << cout_is_not_a_tty);
+    DEBUGF('u', "cin_is_not_a_tty = " << cin_is_not_a_tty << 
+        ", cout_is_not_a_tty = " << cout_is_not_a_tty);
     return cin_is_not_a_tty or cout_is_not_a_tty;
 }
 

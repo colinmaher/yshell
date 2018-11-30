@@ -47,15 +47,15 @@ int main(int argc, char** argv)
     execname(argv[0]);
     cout << boolalpha; // Print false or true instead of 0 or 1.
     cerr << boolalpha;
-    cout << argv[0] << " build " << __DATE__ << " " << __TIME__ << endl;
+    cout << argv[0] << " build " << __DATE__ << " " << __TIME__ 
+        << endl;
     scan_options(argc, argv);
     bool need_echo = want_echo();
     inode_state state;
     try {
         for (;;) {
             try {
-                // Read a line, break at EOF, and echo print the prompt
-                // if one is needed.
+
                 cout << state.prompt();
                 string line;
                 getline(cin, line);
@@ -69,19 +69,16 @@ int main(int argc, char** argv)
                 if (need_echo)
                     cout << line << endl;
 
-                // Split the line into words and lookup the appropriate
-                // function.  Complain or call it.
                 wordvec words = split(line, " \t");
                 DEBUGF('y', "words = " << words);
-            //     cout << "first char: " << words.at(0)[0] << endl;
+
                 if (!words.empty() && words.at(0)[0] != '#') {
                     command_fn fn = find_command_fn(words.at(0));
                     fn(state, words);
                 }
 
             } catch (command_error& error) {
-                // If there is a problem discovered in any function, an
-                // exn is thrown and printed here.
+
                 complain() << error.what() << endl;
             }
         }

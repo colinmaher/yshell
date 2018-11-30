@@ -15,7 +15,7 @@ using namespace std;
 //    Takes a string argument, and sets a flag for each char in the
 //    string.  As a special case, '@', sets all flags.
 // getflag -
-//    Used by the DEBUGF macro to check to see if a flag has been set.
+//    Used by the DEBUGF macro to check to see if a flag has been set
 //    Not to be called by user code.
 
 class debugflags {

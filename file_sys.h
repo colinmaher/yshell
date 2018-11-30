@@ -45,9 +45,13 @@ public:
     inode_state(const inode_state&) = delete; // copy ctor
     inode_state& operator=(const inode_state&) = delete; // op=
     inode_state();
-    void print_dir();
-    void set_prompt(string);
+    void set_prompt(const string);
+    inode_ptr get_cwd();
+    inode_ptr get_root();
     const string& prompt() const;
+    vector<string> get_path();
+    void set_path(vector<string>);
+    void set_cwd(inode_ptr);
 };
 
 // class inode -
@@ -74,6 +78,7 @@ private:
 public:
     inode(file_type);
     int get_inode_nr() const;
+    base_file_ptr get_contents();
 };
 
 // class base_file -
@@ -98,8 +103,14 @@ public:
     virtual const wordvec& readfile() const = 0;
     virtual void writefile(const wordvec& newdata) = 0;
     virtual void remove(const string& filename) = 0;
-    virtual inode_ptr mkdir(const string& dirname) = 0;
-    virtual inode_ptr mkfile(const string& filename) = 0;
+    virtual inode_ptr mkdir(const string& dirname, inode_state& state) = 0;
+    virtual inode_ptr mkfile(const string& filename, inode_state& state) = 0;
+    virtual map<string, inode_ptr> get_map() = 0;
+    virtual bool is_directory() = 0;
+    virtual inode_ptr get_parent() = 0;
+    virtual void set_parent(const inode_ptr& ptr) = 0;
+    virtual void set_map(map<string, inode_ptr>) = 0;
+    virtual bool is_empty() = 0;
 };
 
 // class plain_file -
@@ -114,14 +125,21 @@ public:
 class plain_file : public base_file {
 private:
     wordvec data;
+    inode_ptr parent;
 
 public:
     virtual size_t size() const override;
     virtual const wordvec& readfile() const override;
     virtual void writefile(const wordvec& newdata) override;
     virtual void remove(const string& filename) override;
-    virtual inode_ptr mkdir(const string& dirname) override;
-    virtual inode_ptr mkfile(const string& filename) override;
+    virtual inode_ptr mkdir(const string& dirname, inode_state& state) override;
+    virtual inode_ptr mkfile(const string& filename, inode_state& state) override;
+    virtual map<string, inode_ptr> get_map() override;
+    virtual void set_map(map<string, inode_ptr>) override;
+    virtual bool is_directory() override;
+    virtual inode_ptr get_parent() override;
+    virtual void set_parent(const inode_ptr& ptr) override;
+    virtual bool is_empty() override;
 };
 
 // class directory -
@@ -146,14 +164,21 @@ class directory : public base_file {
 private:
     // Must be a map, not unordered_map, so printing is lexicographic
     map<string, inode_ptr> dirents;
+    inode_ptr parent;
 
 public:
     virtual size_t size() const override;
     virtual const wordvec& readfile() const override;
     virtual void writefile(const wordvec& newdata) override;
     virtual void remove(const string& filename) override;
-    virtual inode_ptr mkdir(const string& dirname) override;
-    virtual inode_ptr mkfile(const string& filename) override;
+    virtual inode_ptr mkdir(const string& dirname, inode_state& state) override;
+    virtual inode_ptr mkfile(const string& filename, inode_state& state) override;
+    virtual map<string, inode_ptr> get_map() override;
+    virtual bool is_directory() override;
+    virtual inode_ptr get_parent() override;
+    virtual void set_parent(const inode_ptr& in) override;
+    virtual void set_map(map<string, inode_ptr>) override;
+    virtual bool is_empty() override;
 };
 
 #endif

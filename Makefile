@@ -26,7 +26,6 @@ ${EXECBIN} : ${OBJECTS}
 	${COMPILECPP} -o $@ ${OBJECTS}
 
 %.o : %.cpp
-	- ${UTILBIN}/cpplint.py.perl $<
 	- ${UTILBIN}/checksource $<
 	${COMPILECPP} -c $<
 

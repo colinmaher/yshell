@@ -16,7 +16,7 @@ using namespace std;
 // Convenient type using to allow brevity of code elsewhere.
 
 template <typename iterator>
-using range_type = pair<iterator,iterator>;
+using range_type = pair<iterator, iterator>;
 
 using wordvec = vector<string>;
 using word_range = range_type<decltype(declval<wordvec>().cbegin())>;
@@ -27,7 +27,7 @@ using word_range = range_type<decltype(declval<wordvec>().cbegin())>;
 //    Returns the basename of the executable image, which is used in
 //    printing error messags.
 
-void execname (const string&);
+void execname(const string&);
 string& execname();
 
 // want_echo -
@@ -44,20 +44,20 @@ bool want_echo();
 //    been printed.
 
 class exit_status {
-   private:
-      static int status;
-   public:
-      static void set (int);
-      static int get();
+private:
+    static int status;
+
+public:
+    static void set(int);
+    static int get();
 };
 
-
 // split -
 //    Split a string into a wordvec (as defined above).  Any sequence
 //    of chars in the delimiter string is used as a separator.  To
 //    Split a pathname, use "/".  To split a shell command, use " ".
 
-wordvec split (const string& line, const string& delimiter);
+wordvec split(const string& line, const string& delimiter);
 
 // complain -
 //    Used for starting error messages.  Sets the exit status to
@@ -74,23 +74,25 @@ ostream& complain();
 //    defined for it.
 
 template <typename item_t>
-ostream& operator<< (ostream& out, const vector<item_t>& vec) {
-   string space = "";
-   for (const auto& item: vec) {
-      out << space << item;
-      space = " ";
-   }
-   return out;
+ostream& operator<<(ostream& out, const vector<item_t>& vec)
+{
+    string space = "";
+    for (const auto& item : vec) {
+        out << space << item;
+        space = " ";
+    }
+    return out;
 }
 
 template <typename iterator>
-ostream& operator<< (ostream& out, range_type<iterator> range) {
-   for (auto itor = range.first; itor != range.second; ++itor) {
-      if (itor != range.first) out << " ";
-      out << *itor;
-   }
-   return out;
+ostream& operator<<(ostream& out, range_type<iterator> range)
+{
+    for (auto itor = range.first; itor != range.second; ++itor) {
+        if (itor != range.first)
+            out << " ";
+        out << *itor;
+    }
+    return out;
 }
 
 #endif
-
