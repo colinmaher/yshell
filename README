@@ -1,0 +1,232 @@
+The following commands are interpreted.  Error messages are
+     printed and nothing is done in the case of invalid operands.
+
+     # string
+          If the first non-space character on a line is a hash, the
+          line is a comment and is ignored.
+
+     cat pathname...
+          The contents of each file is copied to stdout.  An error is
+          reported if no files are specified, a file does not exist,
+          or is a directory.
+
+     cd [pathname]
+          The current directory is set the the pathname given.  If no
+          pathname is specified, the root directory (/) is used.  It
+          is an error if the pathname does not exist or is a plain
+          file, or if more than one operand is given.
+
+     echo [words...]
+          The string, which may be empty, is echoed to stdout on a
+          line by itself.
+
+     exit [status]
+          Exit the program with the given status.  If the status is
+          missing, exit with status 0.  If a non-numeric argument is
+          given, exit with status 127.
+
+     ls [pathname...]
+          A description of the files or directories are printed to
+          stdout.  It is an error if any of the file or directory does
+          not exist.  If no pathname is specified, the current working
+          directory is used.  If a pathname specified is a directory,
+          then the contents of the directory are listed.  A directory
+          listed within a directory is shown by a terminating slash.
+          Elements of a directory are listed lexicographically.
+
+          For each file listed, output consists of the inode number,
+          then the size, then the filename.  Output is lined up into
+          columns and each column is separated from the next by two
+          spaces.  The numeric fields are exactly 6 characters wide
+          and the units position in a column must be aligned.
+
+     lsr [pathname...]
+          As for ls, but a recursive depth-first preorder traversal is
+          done for subdirectories.
+
+     make pathname [words...]
+          The file specified is created and the rest of the words are
+          put in that file.  If the file already exists, a new one is
+          not created, but its contents are replaced.  It is an error
+          to specify a directory.  If there are no words, the file is
+          empty.
+
+     mkdir pathname
+          A new directory is created.  It is an error if a file or
+          directory of the same name already exists, or if the
+          complete pathname to the parent of this new directory does
+          not already exist.  Two entries are added to the directory,
+          namely dot (.) and dotdot (..).  Directory entries are
+          always kept in sorted lexicographic order.
+
+     prompt string
+          Set the prompt to the words specified on the command line.
+          Each word is separated from the next by one space and the
+          prompt itself is terminated by an extra space.  The default
+          prompt is a single percent sign and a space (%_).
+
+     pwd
+          Prints the current working directory.
+
+     rm pathname
+          The specified file or directory is deleted (removed from its
+          parent's list of files and subdirectories).  It is an error
+          for the pathname not to exist.  If the pathname is a
+          directory, it must be empty.
+
+     rmr pathname
+          A recursive removal is done, using a depth-first postorder
+          traversal.
+
++-------------------------------------+--------------------------------+
+|% pwd                                | Initially the cwd is the root  |
+|/                                    | directory.                     |
++-------------------------------------+--------------------------------+
+|% ls                                 | The absence of an operand to   |
+|/:                                   | ls means that dot is used as   |
+|     1       2  .                    | its operand, which is          |
+|     1       2  ..                   | currently the root.            |
+|                                     | Directories always contain at  |
+|                                     | least two items, namely dot    |
+|                                     | and dotdot.  The inode number  |
+|                                     | of the root is always inode    |
+|                                     | #1.  The parent of dotdot is   |
+|                                     | itself.                        |
++-------------------------------------+--------------------------------+
+|% make foo this is a test            | Make a file called foo which   |
+|                                     | contains the string ``this is  |
+|                                     | a test'', which is 14          |
+|                                     | characters.  An inode is       |
+|                                     | allocated, namely inode #2.    |
++-------------------------------------+--------------------------------+
+|% make bar test a is this            | Another file, similarly        |
+|                                     | created, with inode #3.        |
++-------------------------------------+--------------------------------+
+|% ls                                 | Same as the previous output of |
+|/:                                   | ls, except with two more       |
+|     1       4  .                    | files.  Note that files are    |
+|     1       4  ..                   | kept in lexicographic order,   |
+|     3      14  bar                  | so bar is listed before foo.   |
+|     2      14  foo                  |                                |
++-------------------------------------+--------------------------------+
+|% cat food                           | An error message is printed,   |
+|cat: food: No such file or directory | causing the return code from   |
+|                                     | the shell eventually to be 1   |
+|                                     | rather than 0.  Note the error |
+|                                     | format:  command followed by   |
+|                                     | object causing the problem     |
+|                                     | followed by the reason for the |
+|                                     | failure.                       |
++-------------------------------------+--------------------------------+
+|% cat foo                            | Files can consist of only one  |
+|this is a test                       | line, namely a string.         |
++-------------------------------------+--------------------------------+
+|% echo O for a muse of fire          | Arguments to echo are simply   |
+|O for a muse of fire                 | written to the standard        |
+|                                     | output.                        |
++-------------------------------------+--------------------------------+
+|% prompt =>                          | The prompt is changed to the   |
+|                                     | characters ``=>'' followed by  |
+|                                     | a space.  Multiple words would |
+|                                     | have been permitted.           |
++-------------------------------------+--------------------------------+
+|=> rm bar                            | The file bar is deleted and    |
+|                                     | the size of the root directory |
+|                                     | is reduced by 1.               |
++-------------------------------------+--------------------------------+
+|=> make baz foo bar baz              | A new file is created with     |
+|                                     | inode #4.                      |
++-------------------------------------+--------------------------------+
+|=> mkdir test                        | Inode #5 is created as a       |
+|                                     | directory called test.  This   |
+|                                     | directory is a child of the    |
+|                                     | root and contains the two      |
+|                                     | usual entries, dot and dotdot. |
++-------------------------------------+--------------------------------+
+|=> prompt %                          | The prompt is changed back to  |
+|                                     | a % followed by a space.       |
++-------------------------------------+--------------------------------+
+|% ls /                               | Just checking the contents of  |
+|/:                                   | the root.                      |
+|     1       5  .                    |                                |
+|     1       5  ..                   |                                |
+|     4      11  baz                  |                                |
+|     2      14  foo                  |                                |
+|     5       2  test/                |                                |
++-------------------------------------+--------------------------------+
+|% cd test                            | The cwd is now test.           |
++-------------------------------------+--------------------------------+
+|% pwd                                | Yes, it is.                    |
+|/test                                |                                |
++-------------------------------------+--------------------------------+
+|% cd                                 | Without arguments cd goes back |
+|                                     | to the root directory.         |
++-------------------------------------+--------------------------------+
+|% pwd                                | OK.                            |
+|/                                    |                                |
++-------------------------------------+--------------------------------+
+|% cd test                            | Go to a directory called test  |
+|                                     | which is a subdirectory of the |
+|                                     | cwd, whose alias name is       |
+|                                     | always dot.                    |
++-------------------------------------+--------------------------------+
+|% pwd                                |                                |
+|/test                                |                                |
++-------------------------------------+--------------------------------+
+|% cd ..                              | Dotdot is always an alias for  |
+|                                     | the parent of the cwd.         |
++-------------------------------------+--------------------------------+
+|% pwd                                |                                |
+|/                                    |                                |
++-------------------------------------+--------------------------------+
+|% cd test                            | This would have errored out if |
+|% make me me me me                   | test were not a directory or   |
+|                                     | did not exist.  The next       |
+|                                     | available inode is #6.         |
++-------------------------------------+--------------------------------+
+|% cat me                             |                                |
+|me me me                             |                                |
++-------------------------------------+--------------------------------+
+|% cd ..                              |                                |
+|% cd test                            |                                |
++-------------------------------------+--------------------------------+
+|% cat me                             |                                |
+|me me me                             |                                |
++-------------------------------------+--------------------------------+
+|% cd                                 |                                |
++-------------------------------------+--------------------------------+
+|% lsr /                              | Recursive directory listing.   |
+|/:                                   | This is done using a preorder  |
+|     1       5  .                    | traversal.  Withing a given    |
+|     1       5  ..                   | level, lexicographic ordering  |
+|     4      11  baz                  | is used.  Recursion will go    |
+|     2      14  foo                  | through all subdirectories at  |
+|     5       3  test/                | all levels.                    |
+|/test:                               |                                |
+|     5       3  .                    |                                |
+|     1       5  ..                   |                                |
+|     6       8  me                   |                                |
++-------------------------------------+--------------------------------+
+|% cd test                            |                                |
++-------------------------------------+--------------------------------+
+|% mkdir foo                          | Note that foo uses inode #7,   |
+|% cd foo                             | bar uses inode #8, and baz     |
+|% mkdir bar                          | uses inode #9.                 |
+|% cd bar                             |                                |
+|% mkdir baz                          |                                |
+|% cd baz                             |                                |
++-------------------------------------+--------------------------------+
+|% ls .                               | At this point dot is baz and   |
+|.:                                   | dotdot is bar.                 |
+|     9       2  .                    |                                |
+|     8       3  ..                   |                                |
++-------------------------------------+--------------------------------+
+|% cd /                               | A rather large test showing    |
+|% lsr test                           | inode numbers, file and        |
+|/test:                               | directory sizes, and           |
+|     5       4  .                    | filenames.  Note that          |
+|     1       5  ..                   | directory names are indicated  |
+|     7       3  foo/                 | in the listing with a trailing |
+|     6       8  me                   | slash.  Again, the size of a   |
+|/test/foo:                           | file is the number of          |
+|     7       3  .                    | characters in it and the size  |
